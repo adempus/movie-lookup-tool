@@ -2,6 +2,7 @@ import pprint
 from omdb import Movie
 
 class Model(object):
+    ''' Holds data pertaining to responses from queries made to the API'''
     def __init__(self):
         self._favList = list()  # stores a list of movies
         self._movieData = Movie()
@@ -24,8 +25,9 @@ class Model(object):
 
 
 class View(object):
+    ''' Contains prompt outputs for displaying responses for user input. '''
     def promptFavoriteSelect(self, movie):
-        print("Set movie: "+str(movie)+" as favorite? [Y/N]")
+        print("\nSet \'"+str(movie)+"\' as a favorite? [Y/N]:")
 
 
     def promptMovieTitle(self):
@@ -47,8 +49,8 @@ class View(object):
         print("Error: Movie not found!")
 
 
-    def showFavConfirmation(self, movie):
-        print("Added "+str(movie)+" as a favorite.")
+    def confirmFavAdded(self, movie):
+        print("Added \'"+str(movie)+"\' as a favorite.")
 
 
     def viewResponseMenu(self, response):
@@ -63,7 +65,8 @@ class View(object):
 
 
     def displayFavorites(self, favsList):
-        print(favsList)
+        print('\n--My Favorites--\n')
+        pprint.pprint(favsList)
 
 
     def viewMenu(self):
@@ -74,6 +77,7 @@ class View(object):
 
 
 class Controller(object):
+    ''' Contains methods for retrieving user input, and control flow based on user inputs'''
     def __init__(self, model, view, dao):
         self._model = model
         self._view = view
@@ -89,21 +93,9 @@ class Controller(object):
             self.getMovieByTitle()
         elif userIn == 2:
             self._view.displayFavorites(self._model.getFavorites())
+            self.start()
         elif userIn == 3:
             exit(0)
-
-
-    def setFavoriteSelection(self, response):
-        ''' :param response - a tuple'd list response from a query. '''
-        selection = int(input())
-        movie = self._model.getPostQueryResponse()[selection-1]
-        self._view.promptFavoriteSelect(movie)
-        userIn = str(input()).capitalize()
-        if userIn == 'Y':
-            self._model.setFavorite(movie)
-            self._view.showFavConfirmation(movie)
-        if userIn == 'N':
-            self._view.viewMenu()
 
 
     def getResponseInput(self, response):
@@ -116,6 +108,14 @@ class Controller(object):
             return None
 
 
+    def getFavoritesInput(self):
+        respIn = str(input()).capitalize()
+        if respIn == 'Y':
+            return True
+        else:
+            return False
+
+
     def getMovieByTitle(self):
         self._view.promptMovieTitle()
         movieTitle = str(input())
@@ -124,13 +124,18 @@ class Controller(object):
             self._view.viewResponseMenu(resp)
             selection = self.getResponseInput(resp)
             if selection is not None:
-                movie = self._dao.getMovieDetails(selection[0])
-                self._view.displaySelected(movie)
+                self._view.displaySelected(
+                    self._dao.getMovieDetails(selection[0])
+                )
+                self._view.promptFavoriteSelect(selection[0])
+                saveFav = self.getFavoritesInput()
+                if saveFav:
+                    self._model.setFavorite(selection)
+                    self._view.confirmFavAdded(selection[0])
             else:
                 self._view.alertInvalidResponse()
         else:
             self._view.showErrorMsg()
-        #self.setFavoriteSelection(resp)
         self.start()
 
 

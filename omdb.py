@@ -1,13 +1,16 @@
 import requests
 from textwrap import fill
 
+
 class Movie(object):
+    ''' Class representing a single movie. Holds criteria pertaining to a queried movie. '''
     def __init__(self, title="", year=int(), director="", cast=list(), plot=""):
         self.title = title
         self.year = year
         self.director = director
         self.cast = cast
         self.plot = plot
+
 
     def __str__(self):
         return str("\nTitle: " + self.title +"\n"
@@ -45,6 +48,7 @@ class DAO(object):
 
 
     def generateLink(self, paramVal):
+        ''' :returns a link generated with specified parameters and API key to make an API request. '''
         return self._buildQueryLink(
             self._paramDict[paramVal])+str()
 
@@ -54,7 +58,6 @@ class DAO(object):
             :param - queryStr - the item to search for
             :returns the URL concatenated with the parameter value.
         '''
-        #http://www.omdbapi.com/?t=x-men_2&plot=full
         return self._url+'?'+paramVal+'='+query+self._apiKey
 
 
@@ -62,12 +65,8 @@ class DAO(object):
         ''' :param movieName: the name of a movie to search for.
             :returns a list of tuples of search results if found, otherwise None.
         '''
-        # titleSearch = self._buildQueryLink(
-        #     self._paramDict['search'])+str(movieName)+self._apiKey
-
         titleSearch = self._buildQueryLink(self._paramDict['search'], movieName)
         resp = self.getJsonResponse(titleSearch)
-
         if resp['Response'] == 'True':
             if int(resp['totalResults']) > 1:
                 return self.parseMultiResponse(resp)
@@ -96,6 +95,9 @@ class DAO(object):
 
 
     def parseDataToObj(self, resp):
+        ''' :param resp - a JSON object returned as a response from a movie query.
+            :returns a Movie object constructed from the specified movie request.
+        '''
         movie = Movie(resp['Title'], resp['Year'], resp['Director'],
                       resp['Actors'], resp['Plot'])
         return movie
