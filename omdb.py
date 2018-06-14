@@ -54,7 +54,6 @@ class DAO(object):
             :param - queryStr - the item to search for
             :returns the URL concatenated with the parameter value.
         '''
-        #http://www.omdbapi.com/?t=x-men_2&plot=full
         return self._url+'?'+paramVal+'='+query+self._apiKey
 
 
@@ -62,9 +61,6 @@ class DAO(object):
         ''' :param movieName: the name of a movie to search for.
             :returns a list of tuples of search results if found, otherwise None.
         '''
-        # titleSearch = self._buildQueryLink(
-        #     self._paramDict['search'])+str(movieName)+self._apiKey
-
         titleSearch = self._buildQueryLink(self._paramDict['search'], movieName)
         resp = self.getJsonResponse(titleSearch)
 
