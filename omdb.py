@@ -13,7 +13,7 @@ class Movie(object):
 
 
     def __str__(self):
-        return str("\nTitle: " + self.title +"\n"
+        return str("\n-- " + self.title +" --\n"
                    +"Year: " +str(self.year) +"\n"
                    +"Cast: " +str(self.cast) +"\n"
                    +"Director: " +self.director + "\n"

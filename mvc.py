@@ -55,7 +55,7 @@ class View(object):
 
     def viewResponseMenu(self, response):
         print("\n--Search Results--\n")
-        print('\n'.join('{:d}: {:s}.'.format(n+1, str(r))
+        print('\n'.join('[{:d}]: {:s}.'.format(n+1, str(r))
                         for n, r in enumerate(response)))
         print("\nEnter a selection: ")
 
@@ -71,9 +71,9 @@ class View(object):
 
     def viewMenu(self):
         print("\nEnter choice:"
-              +"\n1: Search movie by title"
-              +"\n2: View Favorites"
-              +"\n3: Exit")
+              +"\n[1]: Search movie by title"
+              +"\n[2]: View Favorites"
+              +"\n[3]: Exit")
 
 
 class Controller(object):
@@ -84,11 +84,21 @@ class Controller(object):
         self._dao = dao
 
 
+    def getIntInput(self):
+        try:
+            userIn = int(input())
+            return userIn
+        except ValueError:
+            self._view.alertInvalidResponse()
+            self.start()
+
+
     def start(self):
         self._view.viewMenu()
-        userIn = int(input())
+        userIn = self.getIntInput()
         while userIn > 3 or userIn < 1:
-            self._view.dispalyInputError()
+            self._view.displayInputError()
+            userIn = self.getIntInput()
         if userIn == 1:
             self.getMovieByTitle()
         elif userIn == 2:
@@ -99,11 +109,10 @@ class Controller(object):
 
 
     def getResponseInput(self, response):
-        respIn = input()
-        if respIn.isdigit():
-            if int(respIn) <= len(response):
-                movie = response[int(respIn)-1]
-                return movie
+        respIn = self.getIntInput()
+        if respIn <= len(response):
+            movie = response[respIn-1]
+            return movie
         else:
             return None
 
